@@ -163,4 +163,63 @@ Let's say we drag "mango" from the right side to the left side:
 4. React re-renders the components with the updated state.
 5. The left `DropZone` now shows three fruits, and the right `DropZone` shows two.
 
+6. Ref
+   jsxCopyimport React, { useRef } from 'react';
+
+const DraggableItem = ({ item }) => {
+const dragRef = useRef(null);
+
+const [{ isDragging }, drag] = useDrag({
+type: 'FRUIT',
+item: { name: item },
+collect: (monitor) => ({
+isDragging: monitor.isDragging(),
+}),
+});
+
+drag(dragRef);
+
+return (
+
+<div ref={dragRef} style={{ opacity: isDragging ? 0.5 : 1 }}>
+{item}
+</div>
+);
+};
+How it helps: Refs provide a way to access DOM nodes or React elements created in the render method. In the context of drag-and-drop, refs are crucial for connecting the draggable elements to the DOM.
+What happens to data: The useRef hook creates a dragRef object. This ref is then passed to the div that represents our draggable item. The drag function from react-dnd uses this ref to set up the necessary event listeners for drag-and-drop functionality.
+When using react-dnd, the drag function needs a reference to the DOM element that should be draggable. By passing dragRef to both the div (via the ref prop) and the drag function, we're essentially saying "make this div draggable".
+If we're dragging "mango", for example:
+
+The ref is attached to the div containing the text "mango".
+The drag function sets up listeners on this div.
+When the user starts dragging, these listeners trigger the drag operation.
+The isDragging state is updated, causing the opacity of the div to change to 0.5.
+
+Additional Benefits:
+
+Performance: Using refs can help optimize performance by avoiding unnecessary re-renders.
+Imperative Operations: Refs allow you to perform imperative operations when necessary, like focusing an input or playing/pausing a video.
+
+Note: While refs are powerful, they should be used sparingly. In most cases, declarative React code is preferred. Refs are mainly useful for cases like managing focus, text selection, or integrating with DOM-based libraries (like drag-and-drop libraries).
+Example Scenario (Updated with Ref)
+Let's revisit our scenario of dragging "mango" from the right side to the left side, now including the role of refs:
+
+The DraggableItem component for "mango" is rendered with a ref attached to its div.
+The useDrag hook uses this ref to make the div draggable.
+When the user starts dragging "mango", the ref allows the drag event to be recognized.
+As "mango" is being dragged, its opacity changes to 0.5 due to the isDragging state.
+When it's dropped on the left DropZone, that component calls moveItem("mango", "right", "left").
+The moveItem function updates the state:
+javascriptCopy{
+left: ["banana", "apple", "mango"],
+right: ["orange", "pear"]
+}
+
+React re-renders the components with the updated state.
+The left DropZone now shows three fruits, and the right DropZone shows two.
+The ref for "mango" is now attached to its new position in the left DropZone.
+
+This example demonstrates how refs work alongside the other React concepts to create a dynamic, interactive drag-and-drop interface.
+
 This example demonstrates how these React concepts work together to create a dynamic, interactive user interface.
